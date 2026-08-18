@@ -2,86 +2,52 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-import requests
+import request
+GUMROAD_PRODUCT_ID = "YOUR_PRODUCT_ID_OR_PERMALINK"
 
-# ==========================================
-# 1. HÀM KIỂM TRA KEY GUMROAD (GIỮ NGUYÊN)
-# ==========================================
 def verify_gumroad_license(license_key):
+    """Hàm kiểm tra license key qua Gumroad API"""
     url = "https://gumroad.com"
-    payload = {
-        "product_id": "YOUR_GUMROAD_PRODUCT_ID", # Tối nay lấy ID dán vào đây
-        "license_key": license_key
+    data = {
+        "product_id": GUMROAD_PRODUCT_ID,
+        "license_key": license_key,
+        "increment_uses_count": "true" # Tăng số lần dùng (nếu bạn giới hạn số thiết bị)
     }
     try:
-        response = requests.post(url, data=payload)
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("success") and not data.get("subscription_cancelled_at"):
-                return True
-        return False
-    except:
-        return False
-
-# ==========================================
-# 2. KHỞI TẠO TRẠNG THÁI HỆ THỐNG
-# ==========================================
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "popup_status" not in st.session_state:
-    st.session_state.popup_status = None  # Có thể là "success", "error" hoặc None
-
-# ==========================================
-# 3. GIAO DIỆN ĐĂNG NHẬP VÀ HIỆN THÔNG BÁO NGUYÊN MÀN HÌNH
-# ==========================================
-if not st.session_state.logged_in:
-    
-    # --- ĐOẠN XỬ LÝ POPUP ĐẬP VÀO MẮT (GIẢ LẬP MODAL) ---
-    if st.session_state.popup_status == "success":
-        st.markdown("---")
-        st.success("### 🎉 XÁC THỰC BẢN QUYỀN THÀNH CÔNG!")
-        st.write("Chào mừng bạn! Hệ thống đã kích hoạt toàn bộ tính năng con Bot.")
-        if st.button("🚀 BẮT ĐẦU SỬ DỤNG NGAY"):
-            st.session_state.logged_in = True
-            st.session_state.popup_status = None
-            st.rerun()
-        st.markdown("---")
+        response = requests.post(url, data=data)
+        result = response.json()
         
-    elif st.session_state.popup_status == "error":
-        st.markdown("---")
-        st.error("### ❌ LỖI: MÃ KEY KHÔNG HỢP LỆ HOẶC HẾT HẠN!")
-        st.write("Vui lòng kiểm tra lại mã Key trong email hoặc gia hạn gói tháng trên Gumroad.")
-        if st.button("🔄 THỬ LẠI"):
-            st.session_state.popup_status = None
-            st.rerun()
-        st.markdown("---")
-        
-    # --- GIAO DIỆN Ô NHẬP ĐĂNG NHẬP CHÍNH ---
-    else:
-        st.title("🔑 Đăng Nhập Hệ Thống Bot")
-        st.write("Vui lòng nhập License Key mua từ Gumroad để sử dụng công cụ.")
-        
-        user_key = st.text_input("Nhập License Key của bạn:", type="password")
-        
-        if st.button("Đăng nhập"):
-            if user_key:
-                with st.spinner("Đang xác thực bản quyền..."):
-                    if verify_gumroad_license(user_key):
-                        st.session_state.popup_status = "success"
-                        st.rerun()
-                    else:
-                        st.session_state.popup_status = "error"
-                        st.rerun()
-            else:  
-                        st.warning("Vui lòng không để trống ô nhập Key.")
+        # Nếu API trả về thành công và license chưa bị hủy/hoàn tiền
+        if response.status_code == 200 and result.gimportet("success") and not result.get("uses", {}).get("refunded"):
+            return True, result
+        else:
+            return False, result.get("message", "Khóa bản quyền không hợp lệ.")
+    except Exception as e:
+        return False, f"Lỗi kết nối API: {str(e)}"
+        license_input = st.text_input("Vui lòng nhập Gumroad License Key của bạn:", type="password")
 
-# ==========================================
-# 4. GIAO DIỆN CHÍNH (NHÉT CODE CỦA NÍ VÀO ĐÂY)
-# ==========================================
+# Nếu người dùng chưa nhập gì, dừng code tại đây để đợi họ nhập
+if not license_input:
+    st.info("Ứng dụng đang khóa. Hãy nhập License Key để tiếp tục.")
+    st.stop()
 
-    if st.sidebar.button("Đăng xuất"):
-        st.session_state.logged_in = False
-        st.rerun()
+# --- PHẦN 2: XÁC THỰC VÀ NGẮT CODE ---
+is_valid, message = verify_gumroad_license(license_input)
+
+if not is_valid:
+    # Hiện thông báo lỗi đỏ
+    st.error(f"Truy cập bị từ chối: {message}")
+    # ĐÁ / NGẮT CODE NGAY LẬP TỨC - Toàn bộ code phía dưới sẽ không được chạy
+    st.stop()
+
+# --- PHẦN 3: NỘI DUNG ỨNG DỤNG CHÍNH ---
+# Code phía dưới này CHỈ chạy khi License Key hoàn toàn hợp lệ
+st.success("Xác thực bản quyền thành công! Chào mừng bạn.")
+
+st.subheader("Tính năng cao cấp của phần mềm")
+# Thêm các chức năng tính toán, phân tích của bạn ở đây...
+st.write("Dữ liệu bí mật 1...")
+st.write("Dữ liệu bí mật 2...")
     # [NÍ NHÉT TOÀN BỘ CODE TÍNH TOÁN, XUẤT BIỂU ĐỒ TRÒN CỦA NÍ VÀO ĐÂY]
     # Ví dụ:
     # data_input = st.text_input("Nhập dữ liệu xuất nhập...")
