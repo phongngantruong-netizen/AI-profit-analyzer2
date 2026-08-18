@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import requests
+
+# ==========================================
+# 1. HÀM KIỂM TRA KEY GUMROAD (GIỮ NGUYÊN)
+# ==========================================
 def verify_gumroad_license(license_key):
     url = "https://gumroad.com"
     payload = {
@@ -19,16 +23,55 @@ def verify_gumroad_license(license_key):
         return False
 
 # ==========================================
-# VỊ TRÍ 3: TIẾP THEO - KHỞI TẠO TRẠNG THÁI ĐĂNG NHẬP
+# 2. ĐỊNH NGHĨA CÁC KIỂU THÔNG BÁO HIỆN NGUYÊN MÀN HÌNH (POPUP)
+# ==========================================
+@st.dialog("Thông báo hệ thống")
+def show_popup(status, message):
+    if status == "success":
+        st.success(message)
+        # Nút bấm để khách đóng popup và vào giao diện chính
+        if st.button("Bắt đầu sử dụng Bot"):
+            st.rerun()
+    elif status == "error":
+        st.error(message)
+        if st.button("Thử lại"):
+            st.rerun()
+
+# ==========================================
+# 3. KHỞI TẠO TRẠNG THÁI ĐĂNG NHẬP
 # ==========================================
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# 2. Khởi tạo trạng thái đăng nhập ban đầu (Nếu chưa có thì đặt là Chưa đăng nhập)
+# ==========================================
+# 4. GIAO DIỆN ĐĂNG NHẬP
+# ==========================================
+if not st.session_state.logged_in:
+    st.title("🔑 Đăng Nhập Hệ Thống Bot")
+    st.write("Vui lòng nhập License Key mua từ Gumroad để sử dụng công cụ.")
+    
+    user_key = st.text_input("Nhập License Key của bạn:", type="password")
+    
+    if st.button("Đăng nhập"):
+        if user_key:
+            with st.spinner("Đang xác thực bản quyền..."):
+                if verify_gumroad_license(user_key):
+                    # Nếu đúng Key -> Đổi trạng thái sang True nhưng hiện popup trước
+                    st.session_state.logged_in = True
+                    show_popup("success", "🎉 Xác thực bản quyền thành công! Chúc bạn làm việc hiệu quả.")
+                else:
+                    # Nếu sai Key -> Hiện popup báo lỗi nguyên màn hình
+                    show_popup("error", "❌ Mã Key không hợp lệ hoặc đã hết hạn gói tháng. Vui lòng kiểm tra lại!")
+        else:
+            st.warning("Vui lòng không để trống ô nhập Key.")
 
-
-    st.title("📊 Giao diện Quản lý Doanh thu & Xuất Excel")
-    st.write("Chào mừng bạn đã trở lại! Hãy nhập dữ liệu shop của bạn vào bên dưới.")
+# ==========================================
+# 5. GIAO DIỆN CHÍNH (NHÉT CODE CŨ CỦA NÍ VÀO ĐÂY)
+# ==========================================
+else:
+    if st.sidebar.button("Đăng xuất"):
+        st.session_state.logged_in = False
+        st.rerun()
     
     # [NÍ NHÉT TOÀN BỘ CODE TÍNH TOÁN, XUẤT BIỂU ĐỒ TRÒN CỦA NÍ VÀO ĐÂY]
     # Ví dụ:
@@ -208,6 +251,4 @@ if st.button("🚀 ACTIVATING AI TO CALCULATE REAL PROFIT"):
             fig.update_traces(textposition='inside', textinfo='percent+label')
             st.plotly_chart(fig, use_container_width=True)
              Nút đăng xuất cho khách nếu cần
-    if st.sidebar.button("Đăng xuất"):
-        st.session_state.logged_in = False
-        st.rerun()
+   
