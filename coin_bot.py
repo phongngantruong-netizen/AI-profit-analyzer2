@@ -2,56 +2,30 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import requests
-
-# 1. Hàm gọi API của Gumroad để kiểm tra Key
 def verify_gumroad_license(license_key):
     url = "https://gumroad.com"
     payload = {
-        "product_id": "YOUR_GUMROAD_PRODUCT_ID", # Tối nay lấy ID trên Gumroad dán vào đây
+        "product_id": "YOUR_GUMROAD_PRODUCT_ID", # Tối nay lấy ID dán vào đây
         "license_key": license_key
     }
     try:
         response = requests.post(url, data=payload)
         if response.status_code == 200:
             data = response.json()
-            # Kiểm tra Key có hợp lệ và gói tháng chưa bị hủy không
             if data.get("success") and not data.get("subscription_cancelled_at"):
                 return True
         return False
     except:
         return False
 
-# 2. Khởi tạo trạng thái đăng nhập ban đầu (Nếu chưa có thì đặt là Chưa đăng nhập)
+# ==========================================
+# VỊ TRÍ 3: TIẾP THEO - KHỞI TẠO TRẠNG THÁI ĐĂNG NHẬP
+# ==========================================
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# 3. Giao diện nếu KHÁCH CHƯA ĐĂNG NHẬP
-if not st.session_state.logged_in:
-    st.title("🔑 Shop Manager Bot - Đăng Nhập")
-    st.write("Vui lòng nhập License Key mua từ Gumroad để sử dụng công cụ.")
-    
-    # Ô nhập Key
-    user_key = st.text_input("Nhập License Key của bạn:", type="password")
-    
-    if st.button("Đăng nhập"):
-        if user_key:
-            # Chạy hàm kiểm tra với Gumroad
-            with st.spinner("Đang xác thực bản quyền..."):
-                if verify_gumroad_license(user_key):
-                    st.session_state.logged_in = True
-                    st.success("🎉 Đăng nhập thành công!")
-                    st.rerun() # Tải lại trang để vào giao diện chính
-                else:
-                    st.error("❌ Key không hợp lệ hoặc đã hết hạn gói tháng!")
-        else:
-            st.warning("Vui lòng không để trống ô nhập Key.")
+# 2. Khởi tạo trạng thái đăng nhập ban đầu (Nếu chưa có thì đặt là Chưa đăng nhập)
 
-# 4. Giao diện CHÍNH CỦA WEB BOT (Khi khách đã đăng nhập thành công)
-else:
-    # Nút Đăng xuất ở góc màn hình
-    if st.sidebar.button("Đăng xuất"):
-        st.session_state.logged_in = False
-        st.rerun()
 
     st.title("📊 Giao diện Quản lý Doanh thu & Xuất Excel")
     st.write("Chào mừng bạn đã trở lại! Hãy nhập dữ liệu shop của bạn vào bên dưới.")
@@ -233,3 +207,7 @@ if st.button("🚀 ACTIVATING AI TO CALCULATE REAL PROFIT"):
             fig = px.pie(df_chi_phi_bieu_do, values='Amount ($)', names='Cost Item', hole=0.4)
             fig.update_traces(textposition='inside', textinfo='percent+label')
             st.plotly_chart(fig, use_container_width=True)
+             Nút đăng xuất cho khách nếu cần
+    if st.sidebar.button("Đăng xuất"):
+        st.session_state.logged_in = False
+        st.rerun()
