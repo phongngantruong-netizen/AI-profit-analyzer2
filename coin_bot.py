@@ -72,7 +72,16 @@ if not st.session_state.logged_in:
                     else:
                         st.session_state.popup_status = "error"
                         st.rerun()
-            else:
+                    else:
+                        st.warning("Vui lòng không để trống ô nhập Key.")
+
+# ==========================================
+# 4. GIAO DIỆN CHÍNH (NHÉT CODE CỦA NÍ VÀO ĐÂY)
+# ==========================================
+else:
+    if st.sidebar.button("Đăng xuất"):
+        st.session_state.logged_in = False
+        st.rerun()
     # [NÍ NHÉT TOÀN BỘ CODE TÍNH TOÁN, XUẤT BIỂU ĐỒ TRÒN CỦA NÍ VÀO ĐÂY]
     # Ví dụ:
     # data_input = st.text_input("Nhập dữ liệu xuất nhập...")
