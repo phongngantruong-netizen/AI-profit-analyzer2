@@ -24,12 +24,14 @@ def verify_gumroad_license(license_key):
             return False, result.get("message", "Khóa bản quyền không hợp lệ.")
     except Exception as e:
         return False, f"Lỗi kết nối API: {str(e)}"
-        license_input = st.text_input("Vui lòng nhập Gumroad License Key của bạn:", type="password")
+        # ĐẢM BẢO DÒNG NÀY PHẢI NẰM TRƯỚC DÒNG KIỂM TRA IF
+license_input = st.text_input("Vui lòng nhập Gumroad License Key:", type="password")
 
-# Nếu người dùng chưa nhập gì, dừng code tại đây để đợi họ nhập
+# Dòng 30 của bạn:
 if not license_input:
     st.info("Ứng dụng đang khóa. Hãy nhập License Key để tiếp tục.")
     st.stop()
+
 
 # --- PHẦN 2: XÁC THỰC VÀ NGẮT CODE ---
 is_valid, message = verify_gumroad_license(license_input)
