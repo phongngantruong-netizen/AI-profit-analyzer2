@@ -78,7 +78,7 @@ if not st.session_state.logged_in:
 # ==========================================
 # 4. GIAO DIỆN CHÍNH (NHÉT CODE CỦA NÍ VÀO ĐÂY)
 # ==========================================
-else:
+
     if st.sidebar.button("Đăng xuất"):
         st.session_state.logged_in = False
         st.rerun()
