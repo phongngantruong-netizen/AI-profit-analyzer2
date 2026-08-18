@@ -250,5 +250,5 @@ if st.button("🚀 ACTIVATING AI TO CALCULATE REAL PROFIT"):
             fig = px.pie(df_chi_phi_bieu_do, values='Amount ($)', names='Cost Item', hole=0.4)
             fig.update_traces(textposition='inside', textinfo='percent+label')
             st.plotly_chart(fig, use_container_width=True)
-             Nút đăng xuất cho khách nếu cần
+             
    
