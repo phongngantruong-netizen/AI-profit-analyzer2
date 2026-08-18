@@ -113,7 +113,7 @@ bang_chi_phi = st.data_editor(
 st.write("---")
 
 # 4. Nút bấm kích hoạt Bộ não AI Pandas để tính Lợi Nhuận Ròng
-if st.button("🚀 KÍCH HOẠT AI TÍNH LỢI NHUẬN THỰC TẾ"):
+if st.button("🚀 ACTIVATING AI TO CALCULATE REAL PROFIT"):
     # Lấy dữ liệu trực tiếp từ bảng kê khai chi phí cuối cùng
     df_chi_phi = pd.DataFrame(bang_chi_phi)
     
