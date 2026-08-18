@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import streamlit as st
 import requests
 
 # ==========================================
@@ -23,56 +24,55 @@ def verify_gumroad_license(license_key):
         return False
 
 # ==========================================
-# 2. ĐỊNH NGHĨA CÁC KIỂU THÔNG BÁO HIỆN NGUYÊN MÀN HÌNH (POPUP)
-# ==========================================
-@st.dialog("Thông báo hệ thống")
-def show_popup(status, message):
-    if status == "success":
-        st.success(message)
-        # Nút bấm để khách đóng popup và vào giao diện chính
-        if st.button("Bắt đầu sử dụng Bot"):
-            st.rerun()
-    elif status == "error":
-        st.error(message)
-        if st.button("Thử lại"):
-            st.rerun()
-
-# ==========================================
-# 3. KHỞI TẠO TRẠNG THÁI ĐĂNG NHẬP
+# 2. KHỞI TẠO TRẠNG THÁI HỆ THỐNG
 # ==========================================
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "popup_status" not in st.session_state:
+    st.session_state.popup_status = None  # Có thể là "success", "error" hoặc None
 
 # ==========================================
-# 4. GIAO DIỆN ĐĂNG NHẬP
+# 3. GIAO DIỆN ĐĂNG NHẬP VÀ HIỆN THÔNG BÁO NGUYÊN MÀN HÌNH
 # ==========================================
 if not st.session_state.logged_in:
-    st.title("🔑 Đăng Nhập Hệ Thống Bot")
-    st.write("Vui lòng nhập License Key mua từ Gumroad để sử dụng công cụ.")
     
-    user_key = st.text_input("Nhập License Key của bạn:", type="password")
-    
-    if st.button("Đăng nhập"):
-        if user_key:
-            with st.spinner("Đang xác thực bản quyền..."):
-                if verify_gumroad_license(user_key):
-                    # Nếu đúng Key -> Đổi trạng thái sang True nhưng hiện popup trước
-                    st.session_state.logged_in = True
-                    show_popup("success", "🎉 Xác thực bản quyền thành công! Chúc bạn làm việc hiệu quả.")
-                else:
-                    # Nếu sai Key -> Hiện popup báo lỗi nguyên màn hình
-                    show_popup("error", "❌ Mã Key không hợp lệ hoặc đã hết hạn gói tháng. Vui lòng kiểm tra lại!")
-        else:
-            st.warning("Vui lòng không để trống ô nhập Key.")
-
-# ==========================================
-# 5. GIAO DIỆN CHÍNH (NHÉT CODE CŨ CỦA NÍ VÀO ĐÂY)
-# ==========================================
-else:
-    if st.sidebar.button("Đăng xuất"):
-        st.session_state.logged_in = False
-        st.rerun()
-    
+    # --- ĐOẠN XỬ LÝ POPUP ĐẬP VÀO MẮT (GIẢ LẬP MODAL) ---
+    if st.session_state.popup_status == "success":
+        st.markdown("---")
+        st.success("### 🎉 XÁC THỰC BẢN QUYỀN THÀNH CÔNG!")
+        st.write("Chào mừng bạn! Hệ thống đã kích hoạt toàn bộ tính năng con Bot.")
+        if st.button("🚀 BẮT ĐẦU SỬ DỤNG NGAY"):
+            st.session_state.logged_in = True
+            st.session_state.popup_status = None
+            st.rerun()
+        st.markdown("---")
+        
+    elif st.session_state.popup_status == "error":
+        st.markdown("---")
+        st.error("### ❌ LỖI: MÃ KEY KHÔNG HỢP LỆ HOẶC HẾT HẠN!")
+        st.write("Vui lòng kiểm tra lại mã Key trong email hoặc gia hạn gói tháng trên Gumroad.")
+        if st.button("🔄 THỬ LẠI"):
+            st.session_state.popup_status = None
+            st.rerun()
+        st.markdown("---")
+        
+    # --- GIAO DIỆN Ô NHẬP ĐĂNG NHẬP CHÍNH ---
+    else:
+        st.title("🔑 Đăng Nhập Hệ Thống Bot")
+        st.write("Vui lòng nhập License Key mua từ Gumroad để sử dụng công cụ.")
+        
+        user_key = st.text_input("Nhập License Key của bạn:", type="password")
+        
+        if st.button("Đăng nhập"):
+            if user_key:
+                with st.spinner("Đang xác thực bản quyền..."):
+                    if verify_gumroad_license(user_key):
+                        st.session_state.popup_status = "success"
+                        st.rerun()
+                    else:
+                        st.session_state.popup_status = "error"
+                        st.rerun()
+            else:
     # [NÍ NHÉT TOÀN BỘ CODE TÍNH TOÁN, XUẤT BIỂU ĐỒ TRÒN CỦA NÍ VÀO ĐÂY]
     # Ví dụ:
     # data_input = st.text_input("Nhập dữ liệu xuất nhập...")
