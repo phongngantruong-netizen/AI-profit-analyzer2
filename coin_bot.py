@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-import request
+import requests
 GUMROAD_PRODUCT_ID = "YOUR_PRODUCT_ID_OR_PERMALINK"
 
 def verify_gumroad_license(license_key):
