@@ -77,6 +77,7 @@ if not st.session_state.logged_in:
     # Ví dụ:
     # data_input = st.text_input("Nhập dữ liệu xuất nhập...")
 # Cấu hình trang web chuyên nghiệp cho dân kinh doanh
+
 st.set_page_config(page_title="AI Profit Analyzer", layout="wide", page_icon="💸")
 st.title("💸 AI Automatically Calculates Online Shop Profit")
 st.success("⚡ EXCLUSIVE VIP TOOL - HELPS SHOP OWNERS KEEP THEIR CASH FLOW SAFE")
