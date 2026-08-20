@@ -48,7 +48,7 @@ st.success("License verification successful! Welcome.")
 
 st.subheader("Advanced software features")
 # Thêm các chức năng tính toán, phân tích của bạn ở đây...
-st.write("Confidential data 1..."")
+st.write("Confidential data 1...")
 st.write("Confidential data 2....")
     # [NÍ NHÉT TOÀN BỘ CODE TÍNH TOÁN, XUẤT BIỂU ĐỒ TRÒN CỦA NÍ VÀO ĐÂY]
     # Ví dụ:
