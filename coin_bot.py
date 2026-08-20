@@ -25,11 +25,11 @@ def verify_gumroad_license(license_key):
     except Exception as e:
         return False, f"Lỗi kết nối API: {str(e)}"
         # ĐẢM BẢO DÒNG NÀY PHẢI NẰM TRƯỚC DÒNG KIỂM TRA IF
-license_input = st.text_input("Vui lòng nhập Gumroad License Key:", type="password")
+license_input = st.text_input("Please enter your Gumroad License Key:", type="password")
 
 # Dòng 30 của bạn:
 if not license_input:
-    st.info("Ứng dụng đang khóa. Hãy nhập License Key để tiếp tục.")
+    st.info("The application is locked. Please enter the License Key to continue.")
     st.stop()
 
 
@@ -38,18 +38,18 @@ is_valid, message = verify_gumroad_license(license_input)
 
 if not is_valid:
     # Hiện thông báo lỗi đỏ
-    st.error(f"Truy cập bị từ chối: {message}")
+    st.error(f"Access denied: {message}")
     # ĐÁ / NGẮT CODE NGAY LẬP TỨC - Toàn bộ code phía dưới sẽ không được chạy
     st.stop()
 
 # --- PHẦN 3: NỘI DUNG ỨNG DỤNG CHÍNH ---
 # Code phía dưới này CHỈ chạy khi License Key hoàn toàn hợp lệ
-st.success("Xác thực bản quyền thành công! Chào mừng bạn.")
+st.success("License verification successful! Welcome.")
 
-st.subheader("Tính năng cao cấp của phần mềm")
+st.subheader("Advanced software features")
 # Thêm các chức năng tính toán, phân tích của bạn ở đây...
-st.write("Dữ liệu bí mật 1...")
-st.write("Dữ liệu bí mật 2...")
+st.write("Confidential data 1..."")
+st.write("Confidential data 2....")
     # [NÍ NHÉT TOÀN BỘ CODE TÍNH TOÁN, XUẤT BIỂU ĐỒ TRÒN CỦA NÍ VÀO ĐÂY]
     # Ví dụ:
     # data_input = st.text_input("Nhập dữ liệu xuất nhập...")
